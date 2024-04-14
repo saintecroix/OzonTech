@@ -34,6 +34,8 @@ func post(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid url", http.StatusBadRequest)
 		return
 	}
+	d := services.DbConnection()
+	defer d.Close()
 }
 
 func get(w http.ResponseWriter, r *http.Request) {

@@ -3,13 +3,16 @@ package services
 import (
 	"OzonTech/internal/models"
 	"crypto/sha256"
+	"database/sql"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"net/url"
 )
 
 func Valid(urlstring string) bool {
-	_, err := url.ParseRequestURI(urlstring)
+	rez, err := url.ParseRequestURI(urlstring)
+	fmt.Println("Valid rez are: " + rez.String())
 	return err == nil
 }
 
@@ -26,6 +29,7 @@ func HashLink(origLink string) string {
 		i := int(b) % len(alphabet)
 		shortenedLink = append(shortenedLink, alphabet[i])
 	}
+	fmt.Println("HashLink rez are: " + string(shortenedLink))
 	return string(shortenedLink)
 }
 
@@ -34,7 +38,17 @@ func AddToMap(link string, short string) error {
 	if ok {
 		return errors.New("url is exist")
 	} else {
-		models.Inmemory[link] = short
+		models.Inmemory[short] = link
+		fmt.Println(models.Inmemory[short])
 		return nil
 	}
+}
+
+func DbConnection() *sql.DB {
+	connStr := "127.0.0.1://127.0.0.1:5432/ozontech"
+	db, errsql := sql.Open("postgres", connStr)
+	if errsql != nil {
+		panic(errsql)
+	}
+	return db
 }

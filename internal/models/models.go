@@ -1,6 +1,6 @@
 package models
 
-var Inmemory map[string]string
+var Inmemory = make(map[string]string)
 
 type Urls struct {
 	Orig  string `json:"orig"`

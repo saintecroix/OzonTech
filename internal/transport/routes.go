@@ -6,7 +6,7 @@ import (
 
 func Routes() *mux.Router {
 	m := mux.NewRouter()
-	m.HandleFunc("/post/{url}", post).Methods("POST")
-	m.HandleFunc("/get/{url}", get).Methods("GET")
+	m.HandleFunc("/post", post).Methods("POST")
+	m.HandleFunc("/get", get).Methods("GET")
 	return m
 }
