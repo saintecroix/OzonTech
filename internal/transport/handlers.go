@@ -8,7 +8,8 @@ import (
 )
 
 type data struct {
-	Data string `json:"data"`
+	Memory string `json:"memory"`
+	Data   string `json:"data"`
 }
 
 func post(w http.ResponseWriter, r *http.Request) {
@@ -18,24 +19,26 @@ func post(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ошибка при декодировании запроса", http.StatusBadRequest)
 		return
 	}
-	if services.Valid(str.Data) == true {
+	switch str.Memory {
+	case "inmemory":
+		if services.Valid(str.Data) != true {
+			http.Error(w, "invalid url", http.StatusBadRequest)
+			break
+		}
 		rez := services.HashLink(str.Data)
 		err := services.AddToMap(str.Data, rez)
-		if err == nil {
-			json, err := json.Marshal(rez)
-			if err != nil {
-				http.Error(w, "Ошибка при кодировании данных в JSON", http.StatusInternalServerError)
-				return
-			}
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(json)
+		if err != nil {
+			http.Error(w, "ERROR: url is already exist", http.StatusBadRequest)
+			break
 		}
-	} else {
-		http.Error(w, "invalid url", http.StatusBadRequest)
-		return
+		json, err := json.Marshal(rez)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(json)
+	case "postgres":
+
+	default:
+
 	}
-	d := services.DbConnection()
-	defer d.Close()
 }
 
 func get(w http.ResponseWriter, r *http.Request) {

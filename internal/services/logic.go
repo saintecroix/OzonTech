@@ -36,7 +36,7 @@ func HashLink(origLink string) string {
 func AddToMap(link string, short string) error {
 	_, ok := models.Inmemory[link]
 	if ok {
-		return errors.New("url is exist")
+		return errors.New("url is already exist")
 	} else {
 		models.Inmemory[short] = link
 		fmt.Println(models.Inmemory[short])
@@ -50,5 +50,6 @@ func DbConnection() *sql.DB {
 	if errsql != nil {
 		panic(errsql)
 	}
+	fmt.Println("Connected to database")
 	return db
 }
