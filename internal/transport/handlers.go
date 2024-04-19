@@ -14,6 +14,10 @@ type data struct {
 	Data   string `json:"data"`
 }
 
+type result struct {
+	Url string `json:"url"`
+}
+
 func post(w http.ResponseWriter, r *http.Request) {
 	str := data{}
 	err := json.NewDecoder(r.Body).Decode(&str)
@@ -33,7 +37,10 @@ func post(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "ERROR: url is already exist", http.StatusBadRequest)
 			break
 		}
-		json, err := json.Marshal(rez)
+		var v models.Urls
+		v.Orig = str.Data
+		v.Short = rez
+		json, err := json.Marshal(v)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(json)
 	case "postgres":
@@ -51,7 +58,10 @@ func post(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer insert.Close()
-		json, err := json.Marshal(rez)
+		var v models.Urls
+		v.Orig = str.Data
+		v.Short = rez
+		json, err := json.Marshal(v)
 		if err != nil {
 			http.Error(w, "Ошибка при кодировании данных в JSON", http.StatusInternalServerError)
 			return
@@ -75,7 +85,10 @@ func get(w http.ResponseWriter, r *http.Request) {
 	case "inmemory":
 		s, ok := models.Inmemory[str.Data]
 		if ok {
-			json, err := json.Marshal(s)
+			var v models.Urls
+			v.Orig = s
+			v.Short = str.Data
+			json, err := json.Marshal(v)
 			if err != nil {
 				http.Error(w, "Ошибка при кодировании данных в JSON", http.StatusInternalServerError)
 				return
@@ -96,6 +109,7 @@ func get(w http.ResponseWriter, r *http.Request) {
 		}
 		defer get.Close()
 		var v models.Urls
+		v.Short = str.Data
 		for get.Next() {
 			err := get.Scan(&v.Orig)
 			if err != nil {
@@ -104,7 +118,7 @@ func get(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if v.Orig != "" {
-			json, err := json.Marshal(v.Orig)
+			json, err := json.Marshal(v)
 			if err != nil {
 				http.Error(w, "Ошибка при кодировании данных в JSON", http.StatusInternalServerError)
 				return
