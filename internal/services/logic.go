@@ -45,7 +45,7 @@ func AddToMap(link string, short string) error {
 }
 
 func DbConnection() *sql.DB {
-	connStr := "127.0.0.1://127.0.0.1:5432/ozontech"
+	connStr := "host=db port=5432 user=postgres password=postgres dbname=postgres sslmode=disable"
 	db, errsql := sql.Open("postgres", connStr)
 	if errsql != nil {
 		panic(errsql)
